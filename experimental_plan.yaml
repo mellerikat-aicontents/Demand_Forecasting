@@ -1,0 +1,180 @@
+## 외부에서 데이터 가져오기 / 결과 저장하는 경우 해당 위치에 지정
+name: fcst_simulation
+version: 1.0.0
+
+external_path:
+    - load_train_data_path: ./solution/sample_data/electronic_train
+    - load_inference_data_path:  ./solution/sample_data/electronic_test/
+    - save_train_artifacts_path:
+    - save_inference_artifacts_path:
+    - load_model_path:
+
+external_path_permission:
+    - aws_key_profile:
+user_parameters:
+    - train_pipeline:
+        - step: train  ## 필수
+          args:
+              - dataset_group_key: [건물번호]
+                dataset_timestamp: 일시 
+                dataset_freqeuncy: hour
+                dataset_target: 전력소비량(kWh)
+                dataset_known_real: [기온(C), 강수량(mm), 풍속(m/s), 습도(%), hour, weekday, 마트휴일,  공휴일,전력소비_lag24]
+                dataset_known_categoricals: []
+                dataset_unknown_real: [전력소비량(kWh)]
+                dataset_unknown_categoricals: []
+                dataset_static_reals: [연면적(m2), 냉방면적(m2), 태양광용량(kW), ESS저장용량(kWh), PCS용량(kW)]
+                dataset_static_categoricals: [건물번호, 건물유형]
+                dataset_max_encoder_length: 72
+                dataset_min_encoder_length: 24
+                dataset_max_prediction_length: 24
+                dataset_min_prediction_length: 6
+                dataset_seed_number: 0
+                dataset_encoder_activation_function: relu
+                dataset_training_cutoff: 0                
+                dataset_add_relative_time_idx: True
+                dataset_add_encoder_length: True
+                dataset_scalers : RobustScaler 
+                model_algorithm: tft
+                model_attention_head_size: 16
+                model_dropout: 0.5
+                model_hidden_continuous_size: 16
+                model_hidden_layer_size: 32
+                model_learning_rate: 0.0005
+                model_log_interval: 10
+                model_output_size: 7
+                model_reduce_on_plateau_patience: 10
+                model_weight_decay: 0.05
+                model_QuantileLoss_para: 1
+                model_labelencodder_embedding:
+                      건물유형: 10
+                      건물번호: 7
+                trainer_batch_size: 512
+                trainer_early_stop_min_delta: 0.0005
+                trainer_early_stop_mode: min
+                trainer_early_stop_monitor: val_loss
+                trainer_early_stop_patience: 10
+                trainer_early_stop_verbose: False
+                trainer_epoch_size: 100
+                trainer_gradient_clip_val: 0.1   
+          ui_args:
+            - dataset_group_key
+              dataset_timestamp
+              dataset_target
+              dataset_known_real
+              dataset_known_categoricals
+              dataset_unknown_real
+              dataset_unknown_categoricals
+              dataset_static_reals
+              dataset_static_categoricals
+              dataset_max_encoder_length
+              dataset_min_encoder_length
+              dataset_max_prediction_length
+              dataset_min_prediction_length
+              model_labelencodder_embedding
+              trainer_batch_size
+              trainer_epoch_size
+              
+    - inference_pipeline:
+        - step: inference 
+          args:
+            - timestamp: 2022-08-22
+              xai: True
+              simulation:
+              
+          ui_args:
+            - timestamp
+            - xai
+        - step: output
+          args:
+            - plotly: True
+          ui_args:
+            - timestamp
+              xai
+              plotly
+            
+## asset 의 설치 정보를 기록
+asset_source:
+    - train_pipeline:
+        - step: train
+          source:
+            code: http://mod.lge.com/hub/smartdata/demand_forecasting_simulation.git
+            # code: local
+            branch: train
+            requirements:
+              - requirements.txt
+              
+    - inference_pipeline:
+        - step: inference
+          source:
+            code: http://mod.lge.com/hub/smartdata/demand_forecasting_simulation.git
+            # code: local
+            branch: inference
+            requirements:
+              - requirements.txt
+              
+        - step: output
+          source:
+            code: http://mod.lge.com/hub/smartdata/demand_forecasting_simulation.git
+            # code: local
+            branch: output
+            requirements:
+              - requirements.txt
+control:
+    ## 1. 패키지 설치 및 asset 존재 여부를 실험 시마다 체크할지, 한번만 할지 결정
+    ## 1-2 requirements.txt 및 종속 패키지들 한번만 설치할 지 매번 설치할지도 결정
+    - get_asset_source: once ## once, every
+    ## 2. 생성된 artifacts 를 backup 할지를 결정 True/False
+    - backup_artifacts: True
+    ## 3. pipeline 로그를 backup 할지를 결정 True/False
+    - backup_log: True
+    ## 4. 저장 공간 사이즈를 결정 (단위 MB)
+    - backup_size: 1000
+    ## 5. Asset 사이 데이터 전달 방법으로 memory, file 를 지원
+    - interface_mode: memory
+
+ui_args_detail:
+    - train_pipeline:
+        - step: input
+          args:                    
+              - name: dataset_known_real
+                description: list of continuous variables that change over time and are known in the future (e.g. price of a product, but not demand of a product).
+                type: string
+                default: "기온(C), 강수량(mm), 풍속(m/s), 습도(%), hour, weekday, 마트휴일,  공휴일,전력소비_lag24"
+                range:
+                  - 1
+                  - 1000000                        
+              - name: dataset_known_categoricals
+                description: list of categorical variables that change over time and are not known in the future, entries can be also lists which are then encoded together (e.g. useful for weather categories). You might want to include your target here.
+                type: string
+                default: ""
+                range:
+                  - 1
+                  - 1000000   
+                  
+              - name: dataset_unknown_real
+                description: list of continuous variables that change over time and are not known in the future. You might want to include your target here.
+                type: string
+                default: "전력소비량(kWh)"
+                range:
+                  - 1
+                  - 1000000
+     
+              - name: dataset_static_reals
+                description: list of continuous variables that do not change over time
+                type: string
+                default: "연면적(m2), 냉방면적(m2), 태양광용량(kW), ESS저장용량(kWh), PCS용량(kW)"
+                range:
+                  - 1
+                  - 1000000   
+     
+              - name: dataset_static_categoricals
+                description: list of categorical variables that do not change over time, entries can be also lists which are then encoded together (e.g. useful for product categories)
+                type: string
+                default: "건물번호, 건물유형"
+                range:
+                  - 1
+                  - 1000000   
+                  
+                  
+    - inference_pipeline:
