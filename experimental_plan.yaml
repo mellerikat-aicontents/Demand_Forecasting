@@ -119,6 +119,7 @@ asset_source:
             # code: local
             branch: main
             requirements:
+              - requirements.txt
             
 control:
     ## 1. 패키지 설치 및 asset 존재 여부를 실험 시마다 체크할지, 한번만 할지 결정
