@@ -98,28 +98,28 @@ asset_source:
     - train_pipeline:
         - step: train
           source:
-            code: http://mod.lge.com/hub/smartdata/demand_forecasting_simulation.git
+            code: https://github.com/mellerikat-aicontents/Demand_Forecasting_train.git
             # code: local
-            branch: train
+            branch: main
             requirements:
               - requirements.txt
               
     - inference_pipeline:
         - step: inference
           source:
-            code: http://mod.lge.com/hub/smartdata/demand_forecasting_simulation.git
+            code: https://github.com/mellerikat-aicontents/demand_forecasting_inference.git
             # code: local
-            branch: inference
+            branch: main
             requirements:
-              - requirements.txt
+            
               
         - step: output
           source:
-            code: http://mod.lge.com/hub/smartdata/demand_forecasting_simulation.git
+            code: https://github.com/mellerikat-aicontents/demand_forecasting_output.git
             # code: local
-            branch: output
+            branch: main
             requirements:
-              - requirements.txt
+            
 control:
     ## 1. 패키지 설치 및 asset 존재 여부를 실험 시마다 체크할지, 한번만 할지 결정
     ## 1-2 requirements.txt 및 종속 패키지들 한번만 설치할 지 매번 설치할지도 결정
