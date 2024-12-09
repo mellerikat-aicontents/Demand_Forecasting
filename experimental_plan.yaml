@@ -19,7 +19,7 @@ user_parameters:
                 dataset_timestamp: 일시 
                 dataset_freqeuncy: hour
                 dataset_target: 전력소비량(kWh)
-                dataset_known_real: [기온(C), 강수량(mm), 풍속(m/s), 습도(%), hour, weekday, 마트휴일,  공휴일,전력소비_lag24]
+                dataset_known_real: [기온(C), 강수량(mm), 풍속(m/s), 습도(%)]
                 dataset_known_categoricals: []
                 dataset_unknown_real: [전력소비량(kWh)]
                 dataset_unknown_categoricals: []
