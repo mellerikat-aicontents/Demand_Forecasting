@@ -3,8 +3,8 @@ name: fcst_simulation
 version: 1.0.0
 
 external_path:
-    - load_train_data_path: ./solution/sample_data/electronic_train
-    - load_inference_data_path:  ./solution/sample_data/electronic_test/
+    - load_train_data_path: ./solution/sample_data/train
+    - load_inference_data_path:  ./solution/sample_data/test
     - save_train_artifacts_path:
     - save_inference_artifacts_path:
     - load_model_path:
@@ -55,7 +55,7 @@ user_parameters:
                 trainer_early_stop_monitor: val_loss
                 trainer_early_stop_patience: 10
                 trainer_early_stop_verbose: False
-                trainer_epoch_size: 100
+                trainer_epoch_size: 1
                 trainer_gradient_clip_val: 0.1   
           ui_args:
             - dataset_group_key
