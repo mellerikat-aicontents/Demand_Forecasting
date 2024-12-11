@@ -1,4 +1,3 @@
-## 외부에서 데이터 가져오기 / 결과 저장하는 경우 해당 위치에 지정
 name: fcst_simulation
 version: 1.0.0
 
@@ -9,11 +8,13 @@ external_path:
     - save_inference_artifacts_path:
     - load_model_path:
 
+
 external_path_permission:
     - aws_key_profile:
+
 user_parameters:
     - train_pipeline:
-        - step: train  ## 필수
+        - step: train
           args:
               - dataset_group_key: [건물번호]
                 dataset_timestamp: 일시 
@@ -54,7 +55,7 @@ user_parameters:
                 trainer_early_stop_monitor: val_loss
                 trainer_early_stop_patience: 10
                 trainer_early_stop_verbose: False
-                trainer_epoch_size: 500
+                trainer_epoch_size: 200
                 trainer_gradient_clip_val: 0.1   
           ui_args:
             - dataset_group_key
@@ -76,7 +77,7 @@ user_parameters:
     - inference_pipeline:
         - step: inference 
           args:
-            - timestamp: 2022-08-09-13
+            - timestamp:
               xai: True
               simulation:
           ui_args:
@@ -116,22 +117,9 @@ asset_source:
             requirements:
               - requirements.txt
             
-control:
-    ## 1. 패키지 설치 및 asset 존재 여부를 실험 시마다 체크할지, 한번만 할지 결정
-    ## 1-2 requirements.txt 및 종속 패키지들 한번만 설치할 지 매번 설치할지도 결정
-    - get_asset_source: once ## once, every
-    ## 2. 생성된 artifacts 를 backup 할지를 결정 True/False
-    - backup_artifacts: True
-    ## 3. pipeline 로그를 backup 할지를 결정 True/False
-    - backup_log: True
-    ## 4. 저장 공간 사이즈를 결정 (단위 MB)
-    - backup_size: 1000
-    ## 5. Asset 사이 데이터 전달 방법으로 memory, file 를 지원
-    - interface_mode: memory
-
 ui_args_detail:
     - train_pipeline:
-        - step: input
+        - step: train
           args:                    
               - name: dataset_known_real
                 description: list of continuous variables that change over time and are known in the future (e.g. price of a product, but not demand of a product)
@@ -240,14 +228,20 @@ ui_args_detail:
                 default:
                     - True
 
-         - step: output
-           args:                    
-               - name: plotly
-                 description: If true solution make XAI visualization
-                 type: single_selection
-                 selectable:
-                     - True
-                     - False
-                 default:
-                     - True
-            
+        - step: output
+          args:                    
+              - name: plotly
+                description: If true solution make XAI visualization
+                type: single_selection
+                selectable:
+                    - True
+                    - False
+                default:
+                    - True            
+
+control:
+    - get_asset_source: once
+    - backup_artifacts: True
+    - backup_log: True
+    - backup_size: 1000
+    - interface_mode: memory
