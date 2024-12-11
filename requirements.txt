@@ -1,8 +1,1 @@
-pip==23.0.1
-pytorch-forecasting==0.10.1
-pytorch-lightning==1.6.4
-torch==1.13.1
-torchmetrics==1.4.0.post0
-torchvision==0.16.2+cu118
-plotly==5.22.0
-ipykernel
+
