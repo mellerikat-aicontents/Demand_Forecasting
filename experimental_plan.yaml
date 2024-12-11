@@ -19,7 +19,7 @@ user_parameters:
                 dataset_timestamp: 일시 
                 dataset_freqeuncy: hour
                 dataset_target: 전력소비량(kWh)
-                dataset_known_real: [기온(C), 강수량(mm), 풍속(m/s), 습도(%)]
+                dataset_known_real: [기온(C), 강수량(mm), 풍속(m/s), 습도(%), hour, weekday, 마트휴일,  공휴일,전력소비_lag24]
                 dataset_known_categoricals: []
                 dataset_unknown_real: [전력소비량(kWh)]
                 dataset_unknown_categoricals: []
@@ -34,7 +34,6 @@ user_parameters:
                 dataset_training_cutoff: 0                
                 dataset_add_relative_time_idx: True
                 dataset_add_encoder_length: True
-                dataset_scalers : RobustScaler 
                 model_algorithm: tft
                 model_attention_head_size: 16
                 model_dropout: 0.5
@@ -55,33 +54,31 @@ user_parameters:
                 trainer_early_stop_monitor: val_loss
                 trainer_early_stop_patience: 10
                 trainer_early_stop_verbose: False
-                trainer_epoch_size: 1
+                trainer_epoch_size: 500
                 trainer_gradient_clip_val: 0.1   
           ui_args:
             - dataset_group_key
-              dataset_timestamp
-              dataset_target
-              dataset_known_real
-              dataset_known_categoricals
-              dataset_unknown_real
-              dataset_unknown_categoricals
-              dataset_static_reals
-              dataset_static_categoricals
-              dataset_max_encoder_length
-              dataset_min_encoder_length
-              dataset_max_prediction_length
-              dataset_min_prediction_length
-              model_labelencodder_embedding
-              trainer_batch_size
-              trainer_epoch_size
+            -  dataset_timestamp
+            -  dataset_target
+            -  dataset_known_real
+            -  dataset_known_categoricals
+            -  dataset_unknown_real
+            -  dataset_unknown_categoricals
+            -  dataset_static_reals
+            -  dataset_static_categoricals
+            -  dataset_max_encoder_length
+            -  dataset_min_encoder_length
+            -  dataset_max_prediction_length
+            -  dataset_min_prediction_length
+            -  trainer_batch_size
+            -  trainer_epoch_size
               
     - inference_pipeline:
         - step: inference 
           args:
-            - timestamp: 2022-08-22
+            - timestamp: 2022-08-09-13
               xai: True
               simulation:
-              
           ui_args:
             - timestamp
             - xai
@@ -89,9 +86,7 @@ user_parameters:
           args:
             - plotly: True
           ui_args:
-            - timestamp
-              xai
-              plotly
+            - plotly
             
 ## asset 의 설치 정보를 기록
 asset_source:
@@ -139,14 +134,14 @@ ui_args_detail:
         - step: input
           args:                    
               - name: dataset_known_real
-                description: list of continuous variables that change over time and are known in the future (e.g. price of a product, but not demand of a product).
+                description: list of continuous variables that change over time and are known in the future (e.g. price of a product, but not demand of a product)
                 type: string
                 default: "기온(C), 강수량(mm), 풍속(m/s), 습도(%), hour, weekday, 마트휴일,  공휴일,전력소비_lag24"
                 range:
                   - 1
                   - 1000000                        
               - name: dataset_known_categoricals
-                description: list of categorical variables that change over time and are not known in the future, entries can be also lists which are then encoded together (e.g. useful for weather categories). You might want to include your target here.
+                description: list of categorical variables that change over time and are not known in the future, entries can be also lists which are then encoded together (e.g. useful for weather categories). You might want to include your target here
                 type: string
                 default: ""
                 range:
@@ -154,7 +149,7 @@ ui_args_detail:
                   - 1000000   
                   
               - name: dataset_unknown_real
-                description: list of continuous variables that change over time and are not known in the future. You might want to include your target here.
+                description: list of continuous variables that change over time and are not known in the future. You might want to include your target here
                 type: string
                 default: "전력소비량(kWh)"
                 range:
@@ -176,6 +171,83 @@ ui_args_detail:
                 range:
                   - 1
                   - 1000000   
-                  
+
+              - name: dataset_max_encoder_length
+                description : maximum length to encode. This is the maximum history length used by the time series dataset
+                type: float
+                default: 72
+                range:
+                  - 1
+                  - 256 
+
+              - name: dataset_min_encoder_length
+                description : minimum allowed length to encode. Defaults to max_encoder_length
+                type: float
+                default: 24
+                range:
+                  - 1
+                  - 256
+
+              - name: dataset_max_prediction_length
+                description : maximum prediction/decoder length (choose this not too short as it can help convergence)
+                type: float
+                default: 24
+                range:
+                  - 1
+                  - 256  
+
+              - name: dataset_min_prediction_length
+                description : minimum prediction/decoder length. Defaults to max_prediction_length
+                type: float
+                default: 12
+                range:
+                  - 1
+                  - 256 
+
+              - name: trainer_batch_size
+                description : train batch size
+                type: float
+                default: 256
+                range:
+                  - 1
+                  - 10000
+
+              - name: trainer_epoch_size
+                description : train epoch size
+                type: float
+                default: 256
+                range:
+                  - 1
+                  - 10000
                   
     - inference_pipeline:
+        - step: inference
+          args:                    
+              - name: timestamp
+                description: plan date (If null model predict the last point of data)
+                type: string
+                default:
+                range:
+                  - 1
+                  - 1000000    
+
+              - name: xai
+                description: If true solution make XAI Information
+                type: single_selection
+                selectable:
+                    - True
+                    - False
+                default:
+                    - True
+
+         - step: output
+           args:                    
+               - name: plotly
+                 description: If true solution make XAI visualization
+                 type: single_selection
+                 selectable:
+                     - True
+                     - False
+                 default:
+                     - True
+            
