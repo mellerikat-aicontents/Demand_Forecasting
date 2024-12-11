@@ -120,7 +120,32 @@ asset_source:
 ui_args_detail:
     - train_pipeline:
         - step: train
-          args:                    
+          args:
+
+              - name: dataset_target
+                description: column denoting the target or list of columns denoting the target - categorical or continous
+                type: string
+                default: "전력소비량(kWh)"
+                range:
+                  - 1
+                  - 1000000    
+
+              - name: dataset_timestamp
+                description: integer column denoting the time index. This columns is used to determine the sequence of samples. If there no missings observations, the time index should increase by +1 for each subsequent sample. The first time_idx for each series does not necessarily have to be 0 but any value is allowed.
+                type: string
+                default: "time_idx"
+                range:
+                  - 1
+                  - 1000000     
+
+              - name: dataset_group_key
+                description: list of column names identifying a time series. This means that the group_ids identify a sample together with the time_idx. If you have only one timeseries, set this to the name of column that is constant.
+                type: string
+                default: "건물번호"
+                range:
+                  - 1
+                  - 1000000   
+
               - name: dataset_known_real
                 description: list of continuous variables that change over time and are known in the future (e.g. price of a product, but not demand of a product)
                 type: string
@@ -143,7 +168,15 @@ ui_args_detail:
                 range:
                   - 1
                   - 1000000
-     
+
+              - name: dataset_unknown_categoricals
+                description: list of categorical variables that change over time and are not known in the future, entries can be also lists which are then encoded together (e.g. useful for weather categories). You might want to include your target here.
+                type: string
+                default:
+                range:
+                  - 1
+                  - 1000000   
+                  
               - name: dataset_static_reals
                 description: list of continuous variables that do not change over time
                 type: string
@@ -240,8 +273,14 @@ ui_args_detail:
                     - True            
 
 control:
-    - get_asset_source: once
+    ## 1. 패키지 설치 및 asset 존재 여부를 실험 시마다 체크할지, 한번만 할지 결정
+    ## 1-2 requirements.txt 및 종속 패키지들 한번만 설치할 지 매번 설치할지도 결정
+    - get_asset_source: once ## once, every
+    ## 2. 생성된 artifacts 를 backup 할지를 결정 True/False
     - backup_artifacts: True
+    ## 3. pipeline 로그를 backup 할지를 결정 True/False
     - backup_log: True
+    ## 4. 저장 공간 사이즈를 결정 (단위 MB)
     - backup_size: 1000
+    ## 5. Asset 사이 데이터 전달 방법으로 memory, file 를 지원
     - interface_mode: memory
