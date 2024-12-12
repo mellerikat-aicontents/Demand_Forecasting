@@ -133,7 +133,7 @@ ui_args_detail:
               - name: dataset_timestamp
                 description: integer column denoting the time index. This columns is used to determine the sequence of samples. If there no missings observations, the time index should increase by +1 for each subsequent sample. The first time_idx for each series does not necessarily have to be 0 but any value is allowed.
                 type: string
-                default: "time_idx"
+                default: "일시"
                 range:
                   - 1
                   - 1000000     
