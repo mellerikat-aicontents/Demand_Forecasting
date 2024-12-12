@@ -19,12 +19,12 @@ user_parameters:
               - dataset_group_key: [건물번호]
                 dataset_timestamp: 일시 
                 dataset_freqeuncy: hour
-                dataset_target: 전력소비량
-                dataset_known_real: [기온, 강수량, 풍속, 습도, hour, weekday, 마트휴일, 공휴일, 전력소비_lag24]
+                dataset_target: 전력소비량(kWh)
+                dataset_known_real: [기온(C), 강수량(mm), 풍속(m/s), 습도(%), hour, weekday, 마트휴일,  공휴일,전력소비_lag24]
                 dataset_known_categoricals: []
-                dataset_unknown_real: [전력소비량]
+                dataset_unknown_real: [전력소비량(kWh)]
                 dataset_unknown_categoricals: []
-                dataset_static_reals: [연면적, 냉방면적, 태양광용량, ESS저장용량, PCS용량]
+                dataset_static_reals: [연면적(m2), 냉방면적(m2), 태양광용량(kW), ESS저장용량(kWh), PCS용량(kW)]
                 dataset_static_categoricals: [건물번호, 건물유형]
                 dataset_max_encoder_length: 72
                 dataset_min_encoder_length: 24
@@ -125,7 +125,7 @@ ui_args_detail:
               - name: dataset_target
                 description: column denoting the target or list of columns denoting the target - categorical or continous
                 type: string
-                default: "전력소비량"
+                default: "전력소비량(kWh)"
                 range:
                   - 1
                   - 1000000    
@@ -149,7 +149,7 @@ ui_args_detail:
               - name: dataset_known_real
                 description: list of continuous variables that change over time and are known in the future (e.g. price of a product, but not demand of a product)
                 type: string
-                default: "기온, 강수량, 풍속, 습도, hour, weekday, 마트휴일, 공휴일, 전력소비_lag24"
+                default: "기온(C), 강수량(mm), 풍속(m/s), 습도(%), hour, weekday, 마트휴일,  공휴일,전력소비_lag24"
                 range:
                   - 1
                   - 1000000                        
@@ -164,7 +164,7 @@ ui_args_detail:
               - name: dataset_unknown_real
                 description: list of continuous variables that change over time and are not known in the future. You might want to include your target here
                 type: string
-                default: "전력소비량"
+                default: "전력소비량(kWh)"
                 range:
                   - 1
                   - 1000000
@@ -180,7 +180,7 @@ ui_args_detail:
               - name: dataset_static_reals
                 description: list of continuous variables that do not change over time
                 type: string
-                default: "연면적, 냉방면적, 태양광용량, ESS저장용량, PCS용량"
+                default: "연면적(m2), 냉방면적(m2), 태양광용량(kW), ESS저장용량(kWh), PCS용량(kW)"
                 range:
                   - 1
                   - 1000000   
